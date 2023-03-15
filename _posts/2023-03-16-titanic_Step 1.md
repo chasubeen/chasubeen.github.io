@@ -111,7 +111,7 @@ warnings.filterwarnings('ignore')
 %matplotlib inline
 ```
 
-### **진행 프로레스**
+- **진행 프로세스**  
 
 **1. 데이터셋 확인**  
 
@@ -158,6 +158,7 @@ warnings.filterwarnings('ignore')
 - 풀려는 문제에 따라 모델을 평가하는 방식도 달라짐
 
 - 학습된 모델이 어떤 것을 학습 하였는지 확인
+
 
 
 # **1. 데이터셋 확인**
