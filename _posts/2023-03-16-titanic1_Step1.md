@@ -115,47 +115,48 @@ warnings.filterwarnings('ignore')
 
 
 
-1. **데이터셋 확인**  
+- 1. **데이터셋 확인**  
 
-- null data를 확인하고, 향후 수정
-
-
-
-2. **탐색적 데이터 분석(exploratory data analysis)**   
-
-- 여러 feature 들을 개별적으로 분석하고, feature들 간의 상관관계를 확인
-
-- 여러 시각화 툴을 사용하여 insight 얻기
+  - null data를 확인하고, 향후 수정
 
 
-3. **feature engineering**  
 
-- 모델을 세우기에 앞서, 모델의 성능을 높일 수 있도록 feature 들을 engineering
+- 2. **탐색적 데이터 분석(exploratory data analysis)**   
 
-- one-hot encoding, class로 나누기, 구간으로 나누기, 텍스트 데이터 처리 등
+  - 여러 feature 들을 개별적으로 분석하고, feature들 간의 상관관계를 확인
 
-
-4. **model 만들기**   
-
-- sklearn을 사용해 모델 생성
-
-  - 파이썬에서 머신러닝을 할 때는 sklearn을 사용하면 수많은 알고리즘을 일관된 문법으로 사용할 수 있음
-
-- 딥러닝을 위해 tensorflow, pytorch 등을 사용
+  - 여러 시각화 툴을 사용하여 insight 얻기
 
 
-5. **모델 학습 및 예측**     
+- 3. **feature engineering**  
 
-- train set을 가지고 모델을 학습시킨 후, test set을 가지고 prediction 수행
+  - 모델을 세우기에 앞서, 모델의 성능을 높일 수 있도록 feature 들을 engineering
+
+  - one-hot encoding, class로 나누기, 구간으로 나누기, 텍스트 데이터 처리 등
 
 
-6. **모델 평가**  
+- 4. **model 만들기**   
 
-- 예측 성능이 원하는 수준인지 판단
+  - sklearn을 사용해 모델 생성
 
-- 풀려는 문제에 따라 모델을 평가하는 방식도 달라짐
+    - 파이썬에서 머신러닝을 할 때는 sklearn을 사용하면 수많은 알고리즘을 일관된 문법으로 사용할 수 있음
 
-- 학습된 모델이 어떤 것을 학습 하였는지 확인
+  - 딥러닝을 위해 tensorflow, pytorch 등을 사용
+
+
+- 5. **모델 학습 및 예측**     
+
+  - train set을 가지고 모델을 학습시킨 후, test set을 가지고 prediction 수행
+
+
+- 6. **모델 평가**  
+
+  - 예측 성능이 원하는 수준인지 판단
+
+  - 풀려는 문제에 따라 모델을 평가하는 방식도 달라짐
+
+  - 학습된 모델이 어떤 것을 학습 하였는지 확인
+
 
 
 # **1. 데이터셋 확인**
