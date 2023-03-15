@@ -5,8 +5,6 @@ categories: ML
 tags: [ECC, DS] 
 toc: true
 author_profile: false
-sidebar:
-    nav: "docs"
 ---
 
 <head>
