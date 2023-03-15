@@ -918,6 +918,7 @@ plt.show()
     - 0을 찾는 문제라면 이 모델은 원하는 결과를 줄 수 없게 됨
 
 
+
 # **2. EDA(Exploratory Data Analysis)**
 
 
