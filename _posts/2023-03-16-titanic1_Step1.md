@@ -4,6 +4,8 @@ title:  "타이타닉 튜토리얼 1_Step 1"
 categories: ML
 tags: [ECC, DS] 
 toc: true
+toc_sticky: true
+toc_label: "Contents"
 author_profile: false
 ---
 
