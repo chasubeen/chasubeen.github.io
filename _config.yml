@@ -23,7 +23,7 @@ name                     : "Subeen Cha"
 description              : "AI/DS 저장소입니다."
 url                      : "https://chasubeen.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
-repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
+repository               : "https://github.com/chasubeen/chasubeen.github.io"
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
 logo                     : "/assets/images/cong.jpg"
 masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
@@ -105,7 +105,7 @@ analytics:
 # Site Author
 author:
   name             : "Subeen Cha"
-  avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
+  avatar           : "/assets/images/cat.jpg"
   bio              : "AI/DS를 소소하게 적는중"
   location         : "South Korea"
   links:
@@ -199,7 +199,7 @@ sass:
 
 # Outputting
 permalink: /:categories/:title/
-paginate: 10 # amount of posts to show
+paginate: 5 # amount of posts to show
 paginate_path: /page:num/
 timezone: Asia/Seoul
 
@@ -275,5 +275,4 @@ defaults:
       toc: true
       toc_sticky: true
       toc_label: "Contents"
-
 date_format: "%Y-%m-%d"
