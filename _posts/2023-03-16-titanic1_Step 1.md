@@ -2,7 +2,7 @@
 layout: single
 title:  "[ECC DS 1주차] 타이타닉 튜토리얼 1 - Exploratory data analysis, visualization, machine learning"
 categories: ML
-tags: [ECC, DS] 
+tags: [ECC, DS, Week 1] 
 author_profile: false
 ---
 
