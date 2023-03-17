@@ -82,7 +82,8 @@ author_profile: false
 
 - 1st level. Titanic: Machine Learning from Disaster
 
-  - 타이타닉 튜토리얼 1_Exploratory data analysis, visualization, machine learning
+  - [타이타닉 튜토리얼 1_Exploratory data analysis, visualization, machine learning]("https://chasubeen.github.io/ml/titanic1_Step-1/")
+  - [EDA To Prediction(DieTanic)]("https://chasubeen.github.io/ml/titanic1_Step-2/")
 
 
 # **0. Import libraries**
