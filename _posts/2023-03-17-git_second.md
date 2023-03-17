@@ -24,6 +24,7 @@ author_profile: false
 
 ## **2-2. 스테이지와 커밋 이해하기**
 - 작업 트리 -> 스테이징 영역 -> 저장소
+
 ![image](https://user-images.githubusercontent.com/98953721/225901410-259738a0-92f4-489e-9c25-0c6203988f58.png)
 
 ### **● 작업 트리(working tree)**
