@@ -79,11 +79,8 @@ author_profile: false
 
 
 - (이유한님) 캐글 코리아 캐글 스터디 커널 커리큘럼
-
 - 1st level. Titanic: Machine Learning from Disaster
-
-  - [타이타닉 튜토리얼 1_Exploratory data analysis, visualization, machine learning]("https://chasubeen.github.io/ml/titanic1_Step-1/")
-  - [EDA To Prediction(DieTanic)]("https://chasubeen.github.io/ml/titanic1_Step-2/")
+  - [타이타닉 튜토리얼 1]("https://chasubeen.github.io/tags/#titanic1")
 
 
 # **0. Import libraries**
