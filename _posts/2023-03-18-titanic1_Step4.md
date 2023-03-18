@@ -1834,6 +1834,5 @@ StackingSubmission.to_csv("StackingSubmission.csv", index = False)
 # **📚Reference**
 
 - [Scikit-learn API](https://scikit-learn.org/stable/modules/classes.html)
-
 - [기술블로그_OOF](https://techblog-history-younghunjo1.tistory.com/142)
 
