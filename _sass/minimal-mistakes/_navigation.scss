@@ -529,12 +529,12 @@
 .toc__menu {
   margin: 0;
   padding: 0;
-  width: 80%;
+  width: 100%;
   list-style: none;
-  font-size: $type-size-6;
+  font-size: $type-size-5;
 
   @include breakpoint($large) {
-    font-size: $type-size-7;
+    font-size: $type-size-6;
   }
 
   a {
@@ -542,7 +542,7 @@
     padding: 0.25rem 0.75rem;
     color: $muted-text-color;
     font-weight: bold;
-    line-height: 1.5;
+    line-height: 1.0;
     border-bottom: 1px solid $border-color;
 
     &:hover {
