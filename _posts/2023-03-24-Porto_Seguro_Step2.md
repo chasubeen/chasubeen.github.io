@@ -1142,9 +1142,9 @@ py.iplot(fig1, filename='plots')
 - 일부 feature의 분포를 검사하고 모델이 중요하다고 생각하는 기능을 식별하기 위해 몇 가지 학습 모델(RandomForest 및 GradientBoosting 분류기)을 구현
 
 
-{% include plotly/ECC/Porto Seguro/Target_variable_distribution.html %}
-{% include plotly/ECC/Porto Seguro/Count_of_binary_variables.html %}
-{% include plotly/ECC/Porto Seguro/GBM_bar.html %}
-{% include plotly/ECC/Porto Seguro/RandomForest_bar.html %}
-{% include plotly/ECC/Porto Seguro/RandomForest_dot.html %}
-{% include plotly/ECC/Porto Seguro/RandomForest_dot.html %}
+{% include plotly/ECC/Porto_Seguro/Target_variable_distribution.html %}
+{% include plotly/ECC/Porto_Seguro/Count_of_binary_variables.html %}
+{% include plotly/ECC/Porto_Seguro/GBM_bar.html %}
+{% include plotly/ECC/Porto_Seguro/RandomForest_bar.html %}
+{% include plotly/ECC/Porto_Seguro/RandomForest_dot.html %}
+{% include plotly/ECC/Porto_Seguro/RandomForest_dot.html %}
