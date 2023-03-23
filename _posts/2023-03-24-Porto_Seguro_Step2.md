@@ -98,7 +98,7 @@ author_profile: false
 
 
 
-### **📌 해당 노트북의 목표**
+## **📌 해당 노트북의 목표**
 
 1. 데이터 품질 점검: 모든 결측값/Null값(-1인 값) 시각화 및 평가
 
@@ -108,9 +108,11 @@ author_profile: false
 
 - 이항, 범주형 및 기타 변수의 검사
 
-3. - 학습 모델을 통한 feature 중요도 순위 매기기
+3. 
 
-  - 학습 과정에 기반하여 feature들을 순위화 할 수 있도록 도와주는 n building Random Forest와 Gradient Boosted model
+- 학습 모델을 통한 feature 중요도 순위 매기기
+
+- 학습 과정에 기반하여 feature들을 순위화 할 수 있도록 도와주는 n building Random Forest와 Gradient Boosted model
 
 
 # **1. Import Libraries & Data Loading**
@@ -990,19 +992,7 @@ fig = go.Figure(data=data, layout=layout)
 py.iplot(fig,filename='scatter2010')
 ```
 
-
-        <script src="/static/components/requirejs/require.js"></script>
-        <script>
-          requirejs.config({
-            paths: {
-              base: '/static/base',
-              plotly: 'https://cdn.plot.ly/plotly-latest.min.js?noext',
-            },
-          });
-        </script>
-        
-
-
+{% include plotly/ECC/Porto_Seguro/GBM_dot.html %}
 
 ```python
 ### 시각화(barplot)
@@ -1037,18 +1027,7 @@ fig1['layout'].update(layout)
 py.iplot(fig1, filename='plots')
 ```
 
-
-        <script src="/static/components/requirejs/require.js"></script>
-        <script>
-          requirejs.config({
-            paths: {
-              base: '/static/base',
-              plotly: 'https://cdn.plot.ly/plotly-latest.min.js?noext',
-            },
-          });
-        </script>
-        
-
+{% include plotly/ECC/Porto_Seguro/GBM_bar.html %}
 
 - RandomForest와 GradientBoost 학습 모델에서 모두 ```ps_car_13``` feature를 가장 중요한 특징으로 선택함
 
@@ -1058,11 +1037,3 @@ py.iplot(fig1, filename='plots')
 - Null 값과 데이터 품질을 검사하고, feature들 간의 선형 상관관계를 조사하여 Porto Seguro 데이터 세트를 상당히 광범위하게 검사함
 
 - 일부 feature의 분포를 검사하고 모델이 중요하다고 생각하는 기능을 식별하기 위해 몇 가지 학습 모델(RandomForest 및 GradientBoosting 분류기)을 구현
-
-
-{% include plotly/ECC/Porto_Seguro/Target_variable_distribution.html %}
-{% include plotly/ECC/Porto_Seguro/Count_of_binary_variables.html %}
-{% include plotly/ECC/Porto_Seguro/GBM_bar.html %}
-{% include plotly/ECC/Porto_Seguro/RandomForest_bar.html %}
-{% include plotly/ECC/Porto_Seguro/RandomForest_dot.html %}
-{% include plotly/ECC/Porto_Seguro/RandomForest_dot.html %}
