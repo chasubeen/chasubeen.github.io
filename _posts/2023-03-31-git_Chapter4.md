@@ -157,11 +157,13 @@ $ git pull origin main
   - ```id_rsa.pub```: 퍼블릭 키
 
 3. 저장된 키 확인하기
+
 ![image](https://user-images.githubusercontent.com/98953721/229124349-1e4263a3-a4c5-403f-9876-bbf9b7eb4864.png)
 
 ## **5-3. 깃허브에 퍼블릭 키 전송하기**
 1. 사용자 컴퓨터에 만들어져 있는 퍼블릭 키를 깃허브 서버로 전송한 다음 저장
 - ```id_rsa.pub``` 파일의 내용 확인하기
+
 ![image](https://user-images.githubusercontent.com/98953721/229126174-c8fbe251-9e03-495d-a247-6a757c90cefb.png)
 
 2. 사용자 컴퓨터에 있는 **프라이빗 키**와 깃허브 서버에 있는 **퍼블릭 키**를 비교
@@ -171,11 +173,13 @@ $ git pull origin main
 
 ## **5-4. SSH 주소로 원격 저장소 연결하기**
 - SSH 주소를 사용해 원격 저장소에 연결
+
 ```
 $ git remote add origin 복사한 ssh 주소
 ```
 
 - 연결된 원격 저장소 확인
+
 ```
 $ git remote -v
 ```
@@ -183,6 +187,7 @@ $ git remote -v
 ![image](https://user-images.githubusercontent.com/98953721/229128535-88480e5b-1d10-4efe-9b4b-7129d49d383b.png)
 
 - 원격 저장소로 푸시
+
 ```
 $ git push -u origin main
 ```
