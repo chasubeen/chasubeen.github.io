@@ -19,6 +19,7 @@ author_profile: false
 
 ### **1-2. 오차 행렬(confusion matrix)**
 - **코드**  
+
 ```Python
 from sklearn.metrics import confusion_matrix
 
