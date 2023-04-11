@@ -82,7 +82,8 @@ array([[ 1,  0],
 - 변수의 값 대신 __순위__ 를 활용한 상관계수 
 - 비모수적 검정(non-parametric test)
 - 데이터 내의 편차와 에러에 민감함
-	- 다중 비교에서의 해결법: 본페로니 교정
+	- 다중 비교에서의 해결법: 본페로니 교정  
+	
 	<span style="background-color:#B2C248"> [References_본페로니 교정(Bonferroni correction)](https://velog.io/@chulhongsung/%EB%8B%A4%EC%A4%91%EA%B2%80%EC%A0%95%EB%AC%B8%EC%A0%9C%EC%99%80-%ED%95%B4%EA%B2%B0%EB%B2%95-%EB%B3%B8%ED%8E%98%EB%A1%9C%EB%8B%88-%EA%B5%90%EC%A0%95) </span>
 	
 # **3️⃣ Baseline Models**
@@ -107,10 +108,12 @@ array([[ 1,  0],
 	- 경계로 표현하는 데이터들 중 가장 ```큰``` 폭을 가지는 경계를 찾는 알고리즘
 	- 서포트 벡터: 영역의 __경계__ 부분의 데이터를 기준으로 한 평행한 두 직선
 	- 마진: 두 집단 사이의 거리 -> 최적의 결정 경계는 마진을 최대화하는 경계
+	
 	<img src = "https://user-images.githubusercontent.com/98953721/230955875-f2d11163-45a1-44ce-9510-c3adf94640a1.png" width = 600 height = 150>
 
 - 변수의 스케일(범위)에 따라 데이터의 위치가 달라짐 -> 결정 경계도 달라짐
 	- 적절한 스케일링이 필요
+	
 	<img src = "https://user-images.githubusercontent.com/98953721/230957025-8638d63c-f62f-48e7-b0a0-ad2b15c29ef3.png" width = 600 height = 150>
 
 ### **2-2. SVC 클래스**
@@ -140,19 +143,21 @@ from sklearn.svm import SVC
 ## **4. MLPClassifier(Multi-Layer Perceptron Classifier)**
 - ```다중 신경망``` 분류 알고리즘을 저장하고 있는 모듈
 - 라이브러리 import
+
 ```Python
 from sklearn.neural_network import MLPClassifier
 ```
 
 - 모델 구현(해당 노트북에서..)
+
 ```Python
 model_results = cv_model(train_set, train_labels,
 											   MLPClassifier(hidden_layer_sizes = (32, 64, 128, 64, 32)),
 												 'MLP', model_results)
 ```
-	
-	- ```model_results``` 변수에 모델 학습 결과를 저장
-	- ```hidden_layer_sizes``` 파라미터: 5개의 은닉층을 만들고 각 계층별로 지정된 개수만큼의 노드를 할당
+
+- ```model_results``` 변수에 모델 학습 결과를 저장
+- ```hidden_layer_sizes``` 파라미터: 5개의 은닉층을 만들고 각 계층별로 지정된 개수만큼의 노드를 할당
 	
 <span style="background-color:#B2C248"> [다층 퍼셉트론](https://ko.d2l.ai/chapter_deep-learning-basics/mlp.html) </span>
 
