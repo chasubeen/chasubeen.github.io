@@ -152,8 +152,8 @@ from sklearn.neural_network import MLPClassifier
 
 ```Python
 model_results = cv_model(train_set, train_labels,
-											   MLPClassifier(hidden_layer_sizes = (32, 64, 128, 64, 32)),
-												 'MLP', model_results)
+                         MLPClassifier(hidden_layer_sizes = (32, 64, 128, 64, 32)),
+                         'MLP', model_results)
 ```
 
 - ```model_results``` 변수에 모델 학습 결과를 저장
@@ -181,6 +181,7 @@ model_results = cv_model(train_set, train_labels,
 
 ## **7. K-NeighborsClassifier**
 - 최근접 이웃 알고리즘
+
 <img src = "https://user-images.githubusercontent.com/98953721/231062830-39134fa1-74fe-49a2-baf7-917658cf7716.png" width = 300 height = 250>
 
 ## **8. Extra Trees Classifier**
