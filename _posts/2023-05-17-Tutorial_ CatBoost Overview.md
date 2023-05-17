@@ -1,0 +1,1213 @@
+---
+layout: single
+title:  "[ECC DS 스터디 10주차] Tutorial: CatBoost Overview"
+categories: Git/Github
+tags: [ECC, Git/Github] 
+author_profile: false
+---
+
+<head>
+  <style>
+    table.dataframe {
+      white-space: normal;
+      width: 100%;
+      height: 240px;
+      display: block;
+      overflow: auto;
+      font-family: Arial, sans-serif;
+      font-size: 0.9rem;
+      line-height: 20px;
+      text-align: center;
+      border: 0px !important;
+    }
+
+    table.dataframe th {
+      text-align: center;
+      font-weight: bold;
+      padding: 8px;
+    }
+
+    table.dataframe td {
+      text-align: center;
+      padding: 8px;
+    }
+
+    table.dataframe tr:hover {
+      background: #b8d1f3; 
+    }
+
+    .output_prompt {
+      overflow: auto;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      border-radius: 0.3rem;
+      -webkit-overflow-scrolling: touch;
+      padding: 0.8rem;
+      margin-top: 0;
+      margin-bottom: 15px;
+      font: 1rem Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      color: $code-text-color;
+      border: solid 1px $border-color;
+      border-radius: 0.3rem;
+      word-break: normal;
+      white-space: pre;
+    }
+
+  .dataframe tbody tr th:only-of-type {
+      vertical-align: middle;
+  }
+
+  .dataframe tbody tr th {
+      vertical-align: top;
+  }
+
+  .dataframe thead th {
+      text-align: center !important;
+      padding: 8px;
+  }
+
+  .page__content p {
+      margin: 0 0 0px !important;
+  }
+
+  .page__content p > strong {
+    font-size: 0.8rem !important;
+  }
+
+  </style>
+</head>
+
+
+# **0. Introduction**
+
+
+- Catboost는 decision tree를 기반 모델로 활용하는 ```gradient boosting``` 모델을 발전시킨 알고리즘
+
+- Catboost는 다음과 같은 문제들을 해결하는 데 활용될 수 있음
+
+  - 분류(이진, 다중)
+
+  - 회귀
+
+  - ranking
+
+- 이러한 작업들은 그들의 ```목적 함수(objective function)```에 따라 달라질 수 있음
+
+  - 경사 하강 중 최소화하려는 것
+
+- Catboost는 모델의 정확도를 측정하기 위해 ```사전에 구축된``` 평가 지표(metric)가 존재
+
+- [공식 도큐먼트](https://catboost.ai/#benchmark)
+
+
+### **📌 Catboost의 강점**
+
+**1. 범주형 변수에 대한 지원**  
+
+- ```범주형``` 변수가 있는 데이터의 경우 CatBoost의 정확도가 다른 알고리즘에 비해 더 좋음
+
+- 범주형 변수에 대한 전처리(ex> one-hot encoding)가 필요 x
+
+  - 몇몇 ```하이퍼 파라미터```만 지정하면 ok
+
+
+
+**2. 과적합(overfitting) 핸들링이 용이**  
+
+- CatBoost는 기존 부스팅 알고리즘의 대안인 ```순서화된``` 부스팅 구현을 활용
+
+- 예를 들어, gradient boosting은 작은 데이터셋에 대해 쉽게 과적합됨
+
+  - Catboost에서는 이러한 경우에 대한 특별한 변형이 존재 -> 과적합 방지
+
+
+
+**3. 빠르고 GPU 학습을 활용하기에 용이**  
+
+- GPU 학습을 지원
+
+
+
+**4. 다른 유용한 피쳐들**  
+
+- 결측치에 대한 처리
+
+- 훌륭한 시각화
+
+
+
+# **1. Catboost 설치**
+
+
+
+```python
+# 해당 예제를 수행하려면 0.14.2 이상이여야 함
+
+!pip install catboost 
+```
+
+<pre>
+Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/
+Collecting catboost
+  Downloading catboost-1.2-cp310-cp310-manylinux2014_x86_64.whl (98.6 MB)
+[2K     [90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m [32m98.6/98.6 MB[0m [31m10.0 MB/s[0m eta [36m0:00:00[0m
+[?25hRequirement already satisfied: graphviz in /usr/local/lib/python3.10/dist-packages (from catboost) (0.20.1)
+Requirement already satisfied: matplotlib in /usr/local/lib/python3.10/dist-packages (from catboost) (3.7.1)
+Requirement already satisfied: numpy>=1.16.0 in /usr/local/lib/python3.10/dist-packages (from catboost) (1.22.4)
+Requirement already satisfied: pandas>=0.24 in /usr/local/lib/python3.10/dist-packages (from catboost) (1.5.3)
+Requirement already satisfied: scipy in /usr/local/lib/python3.10/dist-packages (from catboost) (1.10.1)
+Requirement already satisfied: plotly in /usr/local/lib/python3.10/dist-packages (from catboost) (5.13.1)
+Requirement already satisfied: six in /usr/local/lib/python3.10/dist-packages (from catboost) (1.16.0)
+Requirement already satisfied: python-dateutil>=2.8.1 in /usr/local/lib/python3.10/dist-packages (from pandas>=0.24->catboost) (2.8.2)
+Requirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.10/dist-packages (from pandas>=0.24->catboost) (2022.7.1)
+Requirement already satisfied: contourpy>=1.0.1 in /usr/local/lib/python3.10/dist-packages (from matplotlib->catboost) (1.0.7)
+Requirement already satisfied: cycler>=0.10 in /usr/local/lib/python3.10/dist-packages (from matplotlib->catboost) (0.11.0)
+Requirement already satisfied: fonttools>=4.22.0 in /usr/local/lib/python3.10/dist-packages (from matplotlib->catboost) (4.39.3)
+Requirement already satisfied: kiwisolver>=1.0.1 in /usr/local/lib/python3.10/dist-packages (from matplotlib->catboost) (1.4.4)
+Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.10/dist-packages (from matplotlib->catboost) (23.1)
+Requirement already satisfied: pillow>=6.2.0 in /usr/local/lib/python3.10/dist-packages (from matplotlib->catboost) (8.4.0)
+Requirement already satisfied: pyparsing>=2.3.1 in /usr/local/lib/python3.10/dist-packages (from matplotlib->catboost) (3.0.9)
+Requirement already satisfied: tenacity>=6.2.0 in /usr/local/lib/python3.10/dist-packages (from plotly->catboost) (8.2.2)
+Installing collected packages: catboost
+Successfully installed catboost-1.2
+</pre>
+
+```python
+import catboost
+print(catboost.__version__)
+```
+
+<pre>
+1.2
+</pre>
+# **2. 분류 작업 수행**
+
+
+## **2-1. 라이브러리 & 데이터 import**
+
+
+
+```python
+### 분류를 위한 모듈 import
+
+from catboost import CatBoostClassifier
+```
+
+
+```python
+### 데이터 준비
+
+from catboost import datasets
+
+train_df, test_df = datasets.amazon() # 오직 범주형 변수만 있는 근사한 데이터셋
+
+train_df.shape, test_df.shape
+```
+
+<pre>
+((32769, 10), (58921, 10))
+</pre>
+
+```python
+### 데이터 확인
+
+train_df.head()
+```
+
+<pre>
+   ACTION  RESOURCE  MGR_ID  ROLE_ROLLUP_1  ROLE_ROLLUP_2  ROLE_DEPTNAME  \
+0       1     39353   85475         117961         118300         123472   
+1       1     17183    1540         117961         118343         123125   
+2       1     36724   14457         118219         118220         117884   
+3       1     36135    5396         117961         118343         119993   
+4       1     42680    5905         117929         117930         119569   
+
+   ROLE_TITLE  ROLE_FAMILY_DESC  ROLE_FAMILY  ROLE_CODE  
+0      117905            117906       290919     117908  
+1      118536            118536       308574     118539  
+2      117879            267952        19721     117880  
+3      118321            240983       290919     118322  
+4      119323            123932        19793     119325  
+</pre>
+- train_df에는 label(target) 칼럼이 포함되어 있지만, test_df와 컬럼의 개수가 동일함
+
+  - test_df 데이터 세트에도 target이 포함되어 있나?
+
+
+
+```python
+test_df.head()
+```
+
+<pre>
+   id  RESOURCE  MGR_ID  ROLE_ROLLUP_1  ROLE_ROLLUP_2  ROLE_DEPTNAME  \
+0   1     78766   72734         118079         118080         117878   
+1   2     40644    4378         117961         118327         118507   
+2   3     75443    2395         117961         118300         119488   
+3   4     43219   19986         117961         118225         118403   
+4   5     42093   50015         117961         118343         119598   
+
+   ROLE_TITLE  ROLE_FAMILY_DESC  ROLE_FAMILY  ROLE_CODE  
+0      117879            118177        19721     117880  
+1      118863            122008       118398     118865  
+2      118172            301534       249618     118175  
+3      120773            136187       118960     120774  
+4      118422            300136       118424     118425  
+</pre>
+- target 값을 포함하고 있는 것은 아님
+
+  - id 컬럼이 추가적으로 있는 것이다.
+
+
+- 데이터 세트에 데이터들이 숫자로 포함되어 있지만, 이러한 feature들은 실제로 관리자 ID, 회사 역할 코드 등 직원의 다양한 ```속성```에 대한 코드임
+
+  - 따라서, ```범주형``` 변수라고 해석해야 함
+
+
+## **2-2. 데이터 준비**
+
+
+
+```python
+y = train_df['ACTION']
+X = train_df.drop(columns = 'ACTION') 
+
+### 또는 X를 다음과 같이 준비해도 OK
+# X = train_df.drop('ACTION', axis = 1)
+```
+
+
+```python
+X_test = test_df.drop(columns = 'id') # 불필요한 id 컬럼 제거
+```
+
+
+```python
+### 이후 동일한 데이터를 다시 생성할 수 있도록 seed 값 설정
+
+SEED = 1
+```
+
+
+```python
+from sklearn.model_selection import train_test_split
+
+X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size = 0.25, random_state = SEED)
+```
+
+## **2-3. 모델링**
+
+
+### **a) 1st - 기본 모델**
+
+
+
+```python
+%%time 
+# 수행 시간을 측정하자!
+
+### 파라미터 목록
+params = {'loss_function': 'Logloss', # 손실함수(목적함수, objective fuction)
+          'eval_metric':'AUC', # 평가 지표(metric)
+          'verbose':  200, # 200회 반복할 때마다 교육 과정에 대한 정보를 stdout으로 출력
+          'random_seed': SEED # seed 설정
+         }
+
+cbc_1 = CatBoostClassifier(**params) # 모델 객체 선언
+cbc_1.fit(X_train, y_train, # 학습할 데이터
+          eval_set = (X_valid, y_valid), # 검증용 데이터
+          use_best_model = True, # 모델이 항상 최적 파라미터로 튜닝된 상태를 유지하도록
+          plot = True # 시각화
+         );
+```
+
+<pre>
+MetricVisualizer(layout=Layout(align_self='stretch', height='500px'))
+</pre>
+<pre>
+Learning rate set to 0.069882
+0:	test: 0.5400959	best: 0.5400959 (0)	total: 57.5ms	remaining: 57.4s
+200:	test: 0.8020842	best: 0.8020842 (200)	total: 2.04s	remaining: 8.13s
+400:	test: 0.8237941	best: 0.8237941 (400)	total: 5.24s	remaining: 7.83s
+600:	test: 0.8328464	best: 0.8330283 (598)	total: 7.02s	remaining: 4.66s
+800:	test: 0.8366271	best: 0.8370599 (785)	total: 8.88s	remaining: 2.21s
+999:	test: 0.8417832	best: 0.8417832 (999)	total: 10.6s	remaining: 0us
+
+bestTest = 0.8417831567
+bestIteration = 999
+
+CPU times: user 15.5 s, sys: 942 ms, total: 16.5 s
+Wall time: 10.7 s
+</pre>
+<pre>
+<catboost.core.CatBoostClassifier at 0x7f05f08678b0>
+</pre>
+- 모델이 더 많은 반복을 통해 훈련된다면 더 나은 결과를 보여줄 수 있음(iteration 증가 시, default = 1000)
+
+- 무엇보다도, 우리는 어떤 feature들이 ```범주형``` 변수인지 명시해야 함
+
+  - 위 모델에서 Catboost는 범주형 변수를 명시하지 않아 이들을 모두 수치형 변수로 처리함
+
+  - 범주들 사이에 ```순위```가 매겨짐(class 2 > class 1)
+
+  - ```cat_features = [i1,i2,...,in]```로 범주형 변수임을 명시
+
+
+
+```python
+### Catboost가 범주형 변수들로 취급할 칼럼의 index
+# 데이터 세트의 모든 feature들은 범주형 변수임
+
+cat_features = list(range(X.shape[1]))
+print(cat_features)
+```
+
+<pre>
+[0, 1, 2, 3, 4, 5, 6, 7, 8]
+</pre>
+
+```python
+### 방법 2)
+
+cat_features_names = X.columns # categorical features의 이름을 구체적으로 명시
+cat_features = [X.columns.get_loc(col) for col in cat_features_names]
+print(cat_features)
+```
+
+<pre>
+[0, 1, 2, 3, 4, 5, 6, 7, 8]
+</pre>
+
+```python
+### 방법 3)
+
+condition = True # 범주형 특징의 이름으로만 충족되어야 하는 조건을 지정
+
+cat_features_names = [col for col in X.columns if condition]
+cat_features = [X.columns.get_loc(col) for col in cat_features_names]
+print(cat_features)
+```
+
+<pre>
+[0, 1, 2, 3, 4, 5, 6, 7, 8]
+</pre>
+### **b) 2nd - 범주형 변수 명시**
+
+
+
+```python
+### 범주형 변수의 목록을 명시하여 재학습
+
+%%time
+
+params = {'loss_function': 'Logloss',
+          'eval_metric': 'AUC',
+          'cat_features':  cat_features, # 범주형 변수 명시
+          'verbose':  200,
+          'random_seed':  SEED
+         }
+
+cbc_2 = CatBoostClassifier(**params)
+cbc_2.fit(X_train, y_train,
+          eval_set = (X_valid, y_valid),
+          use_best_model = True,
+          plot = True
+         );
+```
+
+<pre>
+MetricVisualizer(layout=Layout(align_self='stretch', height='500px'))
+</pre>
+<pre>
+Learning rate set to 0.069882
+0:	test: 0.5637606	best: 0.5637606 (0)	total: 69.5ms	remaining: 1m 9s
+200:	test: 0.8955617	best: 0.8955872 (198)	total: 15.2s	remaining: 1m
+400:	test: 0.8985912	best: 0.8987220 (386)	total: 32s	remaining: 47.9s
+600:	test: 0.9004468	best: 0.9005457 (595)	total: 43s	remaining: 28.6s
+800:	test: 0.8997008	best: 0.9007469 (631)	total: 55.5s	remaining: 13.8s
+999:	test: 0.8985767	best: 0.9007469 (631)	total: 1m 9s	remaining: 0us
+
+bestTest = 0.9007468588
+bestIteration = 631
+
+Shrink model to first 632 iterations.
+CPU times: user 1min 35s, sys: 2.02 s, total: 1min 37s
+Wall time: 1min 10s
+</pre>
+<pre>
+<catboost.core.CatBoostClassifier at 0x7f05f08dc6a0>
+</pre>
+- 이전에 비해 성능이 향상됨
+
+- 전체적인 훈련 시간은 증가하였지만, 최고 성능은 더 적은 반복수로 얻어냄(631회 반복)
+
+
+
+- ```early_stopping_rounds = N```을 지정하여 학습을 조기 중단시킬 수 있음
+
+  - N-round에 대한 metric 결과가 개선되지 않으면 모델은 학습을 중단시킴
+
+
+
+```python
+### early stopping 적용
+
+%%time
+
+params = {'loss_function': 'Logloss',
+          'eval_metric': 'AUC',
+          'cat_features': cat_features,
+          'early_stopping_rounds': 200,
+          'verbose': 200,
+          'random_seed': SEED
+         }
+
+cbc_2 = CatBoostClassifier(**params)
+cbc_2.fit(X_train, y_train, 
+          eval_set = (X_valid, y_valid), 
+          use_best_model = True, 
+          plot = True
+         );
+```
+
+<pre>
+MetricVisualizer(layout=Layout(align_self='stretch', height='500px'))
+</pre>
+<pre>
+Learning rate set to 0.069882
+0:	test: 0.5637606	best: 0.5637606 (0)	total: 46ms	remaining: 45.9s
+200:	test: 0.8955617	best: 0.8955872 (198)	total: 10.6s	remaining: 42s
+400:	test: 0.8985912	best: 0.8987220 (386)	total: 24.3s	remaining: 36.3s
+600:	test: 0.9004468	best: 0.9005457 (595)	total: 35.2s	remaining: 23.4s
+800:	test: 0.8997008	best: 0.9007469 (631)	total: 50.2s	remaining: 12.5s
+Stopped by overfitting detector  (200 iterations wait)
+
+bestTest = 0.9007468588
+bestIteration = 631
+
+Shrink model to first 632 iterations.
+CPU times: user 1min 18s, sys: 1.6 s, total: 1min 20s
+Wall time: 53.3 s
+</pre>
+<pre>
+<catboost.core.CatBoostClassifier at 0x7f05f08dfa30>
+</pre>
+### **c) 3rd - GPU 연산 활용**
+
+
+- 기본적으로 CatBoost는 ```CPU```를 사용하여 계산
+
+- GPU에서 계산을 가능하게 하려면 ```task_type = 'GPU'```를 지정하면 됨
+
+
+※ 코랩에서 실행 시 런타임 유형 변경 -> GPU로!
+
+
+
+```python
+### GPU 활용
+
+%%time
+
+params = {'loss_function': 'Logloss',
+          'eval_metric': 'AUC',
+          'cat_features': cat_features,
+          'task_type':  'GPU',
+          'verbose':  200,
+          'random_seed': SEED
+         }
+
+cbc_3 = CatBoostClassifier(**params)
+cbc_3.fit(X_train, y_train,
+          eval_set = (X_valid, y_valid), 
+          use_best_model = True,
+          plot = True
+         );
+```
+
+<pre>
+MetricVisualizer(layout=Layout(align_self='stretch', height='500px'))
+</pre>
+<pre>
+Learning rate set to 0.054241
+</pre>
+<pre>
+Default metric period is 5 because AUC is/are not implemented for GPU
+</pre>
+<pre>
+0:	test: 0.6184174	best: 0.6184174 (0)	total: 78.7ms	remaining: 1m 18s
+200:	test: 0.8792616	best: 0.8792616 (200)	total: 10.7s	remaining: 42.6s
+400:	test: 0.8832826	best: 0.8833058 (390)	total: 20.7s	remaining: 30.9s
+600:	test: 0.8845304	best: 0.8845304 (600)	total: 33.5s	remaining: 22.3s
+800:	test: 0.8854544	best: 0.8854544 (800)	total: 42.4s	remaining: 10.5s
+999:	test: 0.8866701	best: 0.8867319 (995)	total: 58.1s	remaining: 0us
+bestTest = 0.886731863
+bestIteration = 995
+Shrink model to first 996 iterations.
+CPU times: user 52.6 s, sys: 14.3 s, total: 1min 6s
+Wall time: 59.7 s
+</pre>
+<pre>
+<catboost.core.CatBoostClassifier at 0x7f05f08dfbb0>
+</pre>
+- 성능이 크게 개선되지는 않았음
+
+- 몇몇 하이퍼 파라미터들은 오직 GPU 모드에서만 설정 가능함
+
+  - ```grow_policy```: 트리 생성 규칙
+
+  - ```min_data_in_leaf```: 리프 노드의 최소 훈련 샘플 수
+
+  - ```max_leaves```: 결과 트리에서의 최대 리프 수
+
+
+- 일부 데이터 세트에서는 GPU 학습이 훨씬 적은 시간이 소요됨
+
+- ```border_count = N```을 지정하여 GPU 학습을 더울 가속화 할 수 있음
+
+  - N: 각 feature에 대해 고려되는 분할의 수
+
+  - 공식 문서에서는 GPU 학습 시 이를 32로 설정할 것을 제안함
+
+  - 많은 경우 이는 모델의 성능에는 영향을 미치지 않지만 훈련 속도를 크게 향상시킴
+
+
+### **d) 4th - GPU 파라미터 튜닝** 
+
+
+
+```python
+%%time
+
+params = {'loss_function': 'Logloss',
+          'eval_metric': 'AUC',
+          'cat_features': cat_features,
+          'task_type':  'GPU',
+          'border_count': 32,
+          'verbose': 200,
+          'random_seed': SEED
+         }
+
+cbc_4 = CatBoostClassifier(**params)
+cbc_4.fit(X_train, y_train, 
+          eval_set = (X_valid, y_valid), 
+          use_best_model = True, 
+          plot = True
+         );
+```
+
+<pre>
+MetricVisualizer(layout=Layout(align_self='stretch', height='500px'))
+</pre>
+<pre>
+Learning rate set to 0.054241
+0:	test: 0.6184174	best: 0.6184174 (0)	total: 34.2ms	remaining: 34.1s
+</pre>
+<pre>
+Default metric period is 5 because AUC is/are not implemented for GPU
+</pre>
+<pre>
+200:	test: 0.8792616	best: 0.8792616 (200)	total: 8.22s	remaining: 32.7s
+400:	test: 0.8832826	best: 0.8833058 (390)	total: 17.8s	remaining: 26.6s
+600:	test: 0.8845304	best: 0.8845304 (600)	total: 27.9s	remaining: 18.5s
+800:	test: 0.8854544	best: 0.8854544 (800)	total: 38.6s	remaining: 9.59s
+999:	test: 0.8866701	best: 0.8867319 (995)	total: 53.8s	remaining: 0us
+bestTest = 0.886731863
+bestIteration = 995
+Shrink model to first 996 iterations.
+CPU times: user 50.7 s, sys: 11.6 s, total: 1min 2s
+Wall time: 54.6 s
+</pre>
+<pre>
+<catboost.core.CatBoostClassifier at 0x7f05f08df4f0>
+</pre>
+- 성능에 큰 차이는 없지만 속도는 훨씬 빨라졌음
+
+
+### **e) 5th, 6th - 변수 선택(feature selection)**
+
+
+- 경우에 따라 일부 feature들이 ```잘못된``` 정보를 제공한다고 의심할 수 있음
+
+- 이를 실험해보기 위해 수많은 데이터 조각을 만들거나 ```ignored_slice = [i1,i2,...,in]```으로 모델에서 무시할 열 번호 목록을 지정할 수 있음
+
+
+
+```python
+### 실험 1) 데이터 조각 만들기
+
+import numpy as np
+import warnings
+warnings.filterwarnings("ignore")
+```
+
+
+```python
+np.random.seed(SEED)
+
+noise_cols = [f'noise_{i}' for i in range(5)]
+for col in noise_cols:
+    X_train[col] = y_train * np.random.rand(X_train.shape[0])
+    X_valid[col] = np.random.rand(X_valid.shape[0])
+```
+
+
+```python
+X_train.head()
+```
+
+<pre>
+       RESOURCE  MGR_ID  ROLE_ROLLUP_1  ROLE_ROLLUP_2  ROLE_DEPTNAME  \
+16773     27798    1350         117961         118052         122938   
+23491     80701    4571         117961         118225         119924   
+32731     34039    5113         117961         118300         119890   
+7855      42085    4733         118290         118291         120126   
+16475     16358    6046         117961         118446         120317   
+
+       ROLE_TITLE  ROLE_FAMILY_DESC  ROLE_FAMILY  ROLE_CODE   noise_0  \
+16773      117905            117906       290919     117908  0.417022   
+23491      118685            279443       308574     118687  0.720324   
+32731      119433            133686       118424     119435  0.000114   
+7855       118980            166203       118295     118982  0.302333   
+16475      307024            306404       118331     118332  0.146756   
+
+        noise_1   noise_2   noise_3   noise_4  
+16773  0.097850  0.665600  0.979025  0.491624  
+23491  0.855900  0.311763  0.929346  0.391708  
+32731  0.287838  0.896624  0.704050  0.606467  
+7855   0.264320  0.482195  0.028493  0.182570  
+16475  0.022876  0.009307  0.726750  0.623357  
+</pre>
+
+```python
+%%time
+
+params = {'loss_function': 'Logloss',
+          'eval_metric': 'AUC',
+          'cat_features': cat_features,
+          'verbose': 200,
+          'random_seed': SEED
+         }
+
+cbc_5 = CatBoostClassifier(**params)
+cbc_5.fit(X_train, y_train, 
+          eval_set = (X_valid, y_valid), 
+          use_best_model = True, 
+          plot = True
+         );
+```
+
+<pre>
+MetricVisualizer(layout=Layout(align_self='stretch', height='500px'))
+</pre>
+<pre>
+Learning rate set to 0.069882
+0:	test: 0.4990944	best: 0.4990944 (0)	total: 78.3ms	remaining: 1m 18s
+200:	test: 0.5831370	best: 0.5894476 (7)	total: 9.93s	remaining: 39.5s
+400:	test: 0.5831376	best: 0.5894476 (7)	total: 17s	remaining: 25.4s
+600:	test: 0.5831376	best: 0.5894476 (7)	total: 25.4s	remaining: 16.9s
+800:	test: 0.5831378	best: 0.5894476 (7)	total: 32.9s	remaining: 8.16s
+999:	test: 0.5831381	best: 0.5894476 (7)	total: 38.7s	remaining: 0us
+
+bestTest = 0.5894475816
+bestIteration = 7
+
+Shrink model to first 8 iterations.
+CPU times: user 1min 4s, sys: 1.25 s, total: 1min 5s
+Wall time: 39.2 s
+</pre>
+<pre>
+<catboost.core.CatBoostClassifier at 0x7f05eeb78ac0>
+</pre>
+- 성능이 크게 하락함
+
+
+
+```python
+### 실험 2) 무시할 컬럼 목록 지정
+
+ignored_features = list(range(X_train.shape[1] - 5, X_train.shape[1]))
+print(ignored_features)
+```
+
+<pre>
+[9, 10, 11, 12, 13]
+</pre>
+
+```python
+%%time
+
+params = {'loss_function': 'Logloss',
+          'eval_metric': 'AUC',
+          'cat_features': cat_features,
+          'ignored_features': ignored_features, # 무시할 변수들
+          'early_stopping_rounds': 200,
+          'verbose': 200,
+          'random_seed': SEED
+         }
+
+cbc_6 = CatBoostClassifier(**params)
+cbc_6.fit(X_train, y_train, 
+          eval_set = (X_valid, y_valid), 
+          use_best_model = True, 
+          plot = True
+         );
+```
+
+<pre>
+MetricVisualizer(layout=Layout(align_self='stretch', height='500px'))
+</pre>
+<pre>
+Learning rate set to 0.069882
+0:	test: 0.5637606	best: 0.5637606 (0)	total: 42.2ms	remaining: 42.1s
+200:	test: 0.8955617	best: 0.8955872 (198)	total: 10.4s	remaining: 41.3s
+400:	test: 0.8985912	best: 0.8987220 (386)	total: 21.7s	remaining: 32.4s
+600:	test: 0.9004468	best: 0.9005457 (595)	total: 33.4s	remaining: 22.2s
+800:	test: 0.8997008	best: 0.9007469 (631)	total: 45s	remaining: 11.2s
+Stopped by overfitting detector  (200 iterations wait)
+
+bestTest = 0.9007468588
+bestIteration = 631
+
+Shrink model to first 632 iterations.
+CPU times: user 1min 18s, sys: 1.44 s, total: 1min 20s
+Wall time: 47 s
+</pre>
+<pre>
+<catboost.core.CatBoostClassifier at 0x7f05eeb7b8b0>
+</pre>
+
+```python
+### 실험 1로 만든 noise를 제거하고 데이터를 원래 상태로 돌리기
+
+X_train = X_train.drop(columns = noise_cols)
+X_valid = X_valid.drop(columns = noise_cols)
+```
+
+
+```python
+X_train.head()
+```
+
+<pre>
+       RESOURCE  MGR_ID  ROLE_ROLLUP_1  ROLE_ROLLUP_2  ROLE_DEPTNAME  \
+16773     27798    1350         117961         118052         122938   
+23491     80701    4571         117961         118225         119924   
+32731     34039    5113         117961         118300         119890   
+7855      42085    4733         118290         118291         120126   
+16475     16358    6046         117961         118446         120317   
+
+       ROLE_TITLE  ROLE_FAMILY_DESC  ROLE_FAMILY  ROLE_CODE  
+16773      117905            117906       290919     117908  
+23491      118685            279443       308574     118687  
+32731      119433            133686       118424     119435  
+7855       118980            166203       118295     118982  
+16475      307024            306404       118331     118332  
+</pre>
+### **f) 7th - Pool 객체 활용**
+
+
+- Catboost는 학습 데이터로 Pool 객체도 받을 수 있음
+
+- ```Pool 객체```
+
+  - 범주형 컬럼 인덱스(정수로 지정) 또는 이름(문자열로 지정)의 1차원 배열
+
+
+
+```python
+from catboost import Pool
+
+train_data = Pool(data = X_train,
+                  label = y_train,
+                  cat_features = cat_features
+                 )
+
+valid_data = Pool(data = X_valid,
+                  label = y_valid,
+                  cat_features = cat_features
+                 )
+```
+
+
+```python
+%%time
+
+params = {'loss_function':'Logloss',
+          'eval_metric':'AUC',
+#         'cat_features': cat_features, # 이미 Pool 객체에서 지정함
+          'early_stopping_rounds': 200,
+          'verbose': 200,
+          'random_seed': SEED
+         }
+
+cbc_7 = CatBoostClassifier(**params)
+cbc_7.fit(train_data, # instead of X_train, y_train
+          eval_set = valid_data, # instead of (X_valid, y_valid)
+          use_best_model = True, 
+          plot = True
+         );
+```
+
+<pre>
+MetricVisualizer(layout=Layout(align_self='stretch', height='500px'))
+</pre>
+<pre>
+Learning rate set to 0.069882
+0:	test: 0.5637606	best: 0.5637606 (0)	total: 44.6ms	remaining: 44.6s
+200:	test: 0.8955617	best: 0.8955872 (198)	total: 13.6s	remaining: 54.2s
+400:	test: 0.8985912	best: 0.8987220 (386)	total: 27.7s	remaining: 41.4s
+600:	test: 0.9004468	best: 0.9005457 (595)	total: 49.6s	remaining: 32.9s
+800:	test: 0.8997008	best: 0.9007469 (631)	total: 1m 2s	remaining: 15.5s
+Stopped by overfitting detector  (200 iterations wait)
+
+bestTest = 0.9007468588
+bestIteration = 631
+
+Shrink model to first 632 iterations.
+CPU times: user 1min 19s, sys: 1.65 s, total: 1min 20s
+Wall time: 1min 4s
+</pre>
+<pre>
+<catboost.core.CatBoostClassifier at 0x7f05f08df190>
+</pre>
+### **📌 Pool 객체를 활용하는 이유**
+
+- 예를 들어, 데이터의 일부가 구식이거나 부정확할 수 있음
+
+  - ```Pool.set_weight()```를 통해 데이터의 인스턴스(=> 행)에 가중치를 부여할 수 있음
+
+- 또는 Pool을 사용하여 데이터 그룹을 나눌 수 있음
+
+  - ```set_group_id()```를 지정하고 ```Pool.set_group_weight()```을 활용하여 서로 다른 그룹에 대해 서로 다른 가중치를 적용할 수 있음
+
+
+
+- 기준선을 계산할 수 있음
+
+  - ```Pool.set_baseline()```을 사용하여 모든 입력 개체에 대한 초기 수식 값을 제공할 수 있음
+
+  - 훈련이 0에서 시작하는 것이 아닌 지정된 값에서 시작함
+
+- Pool 객체는 데이터의 경계 부분을 포함할 수 있는 좋은 방법임
+
+
+
+
+
+### **g) 8th - 교차 검증(Cross Validation)**
+
+
+
+```python
+from catboost import cv
+```
+
+
+```python
+%%time
+
+params = {'loss_function': 'Logloss',
+          'eval_metric': 'AUC',
+          'verbose': 200,
+          'random_seed': SEED
+         }
+
+all_train_data = Pool(data = X,
+                      label = y,
+                      cat_features = cat_features
+                     )
+
+scores = cv(pool = all_train_data,
+            params = params, 
+            fold_count = 4,
+            seed = SEED, 
+            shuffle = True,
+            stratified = True, # True면 각 클래스에 대한 표본 비율을 보존하며 fold 생성
+            plot = True
+           )
+```
+
+<pre>
+MetricVisualizer(layout=Layout(align_self='stretch', height='500px'))
+</pre>
+<pre>
+Training on fold [0/4]
+0:	test: 0.5000000	best: 0.5000000 (0)	total: 15.7ms	remaining: 15.7s
+200:	test: 0.8948050	best: 0.8948050 (200)	total: 11.1s	remaining: 44s
+400:	test: 0.8993043	best: 0.8993043 (400)	total: 22.7s	remaining: 33.9s
+600:	test: 0.9019037	best: 0.9019037 (600)	total: 36.6s	remaining: 24.3s
+800:	test: 0.9027905	best: 0.9031492 (781)	total: 48.8s	remaining: 12.1s
+999:	test: 0.9036792	best: 0.9036792 (999)	total: 1m 1s	remaining: 0us
+
+bestTest = 0.9036791642
+bestIteration = 999
+
+Training on fold [1/4]
+0:	test: 0.5000000	best: 0.5000000 (0)	total: 16.8ms	remaining: 16.7s
+200:	test: 0.8835559	best: 0.8840146 (166)	total: 10.4s	remaining: 41.3s
+400:	test: 0.8852191	best: 0.8853875 (382)	total: 23.1s	remaining: 34.5s
+600:	test: 0.8859059	best: 0.8859447 (591)	total: 36.8s	remaining: 24.4s
+800:	test: 0.8860087	best: 0.8865844 (746)	total: 49.7s	remaining: 12.3s
+999:	test: 0.8841890	best: 0.8865844 (746)	total: 1m 2s	remaining: 0us
+
+bestTest = 0.8865843778
+bestIteration = 746
+
+Training on fold [2/4]
+0:	test: 0.5000000	best: 0.5000000 (0)	total: 60.1ms	remaining: 1m
+200:	test: 0.8762431	best: 0.8762994 (198)	total: 11.4s	remaining: 45.5s
+400:	test: 0.8825299	best: 0.8825365 (399)	total: 24.9s	remaining: 37.1s
+600:	test: 0.8859397	best: 0.8859462 (593)	total: 38.5s	remaining: 25.6s
+800:	test: 0.8876071	best: 0.8876071 (800)	total: 52.4s	remaining: 13s
+999:	test: 0.8890818	best: 0.8890895 (998)	total: 1m 7s	remaining: 0us
+
+bestTest = 0.8890894812
+bestIteration = 998
+
+Training on fold [3/4]
+0:	test: 0.5000000	best: 0.5000000 (0)	total: 15.7ms	remaining: 15.7s
+200:	test: 0.8848750	best: 0.8848750 (200)	total: 11.9s	remaining: 47.2s
+400:	test: 0.8886395	best: 0.8886395 (400)	total: 33.3s	remaining: 49.7s
+600:	test: 0.8917459	best: 0.8917475 (599)	total: 49.4s	remaining: 32.8s
+800:	test: 0.8926586	best: 0.8928882 (763)	total: 1m 3s	remaining: 15.8s
+999:	test: 0.8919993	best: 0.8928882 (763)	total: 1m 18s	remaining: 0us
+
+bestTest = 0.892888207
+bestIteration = 763
+
+CPU times: user 6min 21s, sys: 33.8 s, total: 6min 55s
+Wall time: 4min 30s
+</pre>
+
+```python
+### 피처 중요도 시각화
+
+import pandas as pd
+
+feature_importance_df = cbc_7.get_feature_importance(prettified = True)
+feature_importance_df
+```
+
+<pre>
+         Feature Id  Importances
+0          RESOURCE    19.191502
+1     ROLE_DEPTNAME    15.756340
+2            MGR_ID    15.621862
+3     ROLE_ROLLUP_2    13.129965
+4  ROLE_FAMILY_DESC    10.059007
+5        ROLE_TITLE     7.790703
+6       ROLE_FAMILY     6.412647
+7     ROLE_ROLLUP_1     6.224750
+8         ROLE_CODE     5.813223
+</pre>
+
+```python
+### 시각화
+
+from matplotlib import pyplot as plt
+import seaborn as sns
+
+plt.figure(figsize=(12, 6));
+sns.barplot(x= 'Importances', y="Feature Id", data=feature_importance_df);
+plt.title('CatBoost features importance:')
+```
+
+<pre>
+Text(0.5, 1.0, 'CatBoost features importance:')
+</pre>
+<pre>
+<Figure size 1200x600 with 1 Axes>
+</pre>
+- 더 자세히 살펴보자.
+
+
+
+```python
+!pip install shap
+```
+
+<pre>
+Looking in indexes: https://pypi.org/simple, https://us-python.pkg.dev/colab-wheels/public/simple/
+Collecting shap
+  Downloading shap-0.41.0-cp310-cp310-manylinux_2_12_x86_64.manylinux2010_x86_64.whl (572 kB)
+[2K     [90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m [32m572.6/572.6 kB[0m [31m36.1 MB/s[0m eta [36m0:00:00[0m
+[?25hRequirement already satisfied: numpy in /usr/local/lib/python3.10/dist-packages (from shap) (1.22.4)
+Requirement already satisfied: scipy in /usr/local/lib/python3.10/dist-packages (from shap) (1.10.1)
+Requirement already satisfied: scikit-learn in /usr/local/lib/python3.10/dist-packages (from shap) (1.2.2)
+Requirement already satisfied: pandas in /usr/local/lib/python3.10/dist-packages (from shap) (1.5.3)
+Requirement already satisfied: tqdm>4.25.0 in /usr/local/lib/python3.10/dist-packages (from shap) (4.65.0)
+Requirement already satisfied: packaging>20.9 in /usr/local/lib/python3.10/dist-packages (from shap) (23.1)
+Collecting slicer==0.0.7 (from shap)
+  Downloading slicer-0.0.7-py3-none-any.whl (14 kB)
+Requirement already satisfied: numba in /usr/local/lib/python3.10/dist-packages (from shap) (0.56.4)
+Requirement already satisfied: cloudpickle in /usr/local/lib/python3.10/dist-packages (from shap) (2.2.1)
+Requirement already satisfied: llvmlite<0.40,>=0.39.0dev0 in /usr/local/lib/python3.10/dist-packages (from numba->shap) (0.39.1)
+Requirement already satisfied: setuptools in /usr/local/lib/python3.10/dist-packages (from numba->shap) (67.7.2)
+Requirement already satisfied: python-dateutil>=2.8.1 in /usr/local/lib/python3.10/dist-packages (from pandas->shap) (2.8.2)
+Requirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.10/dist-packages (from pandas->shap) (2022.7.1)
+Requirement already satisfied: joblib>=1.1.1 in /usr/local/lib/python3.10/dist-packages (from scikit-learn->shap) (1.2.0)
+Requirement already satisfied: threadpoolctl>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from scikit-learn->shap) (3.1.0)
+Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.10/dist-packages (from python-dateutil>=2.8.1->pandas->shap) (1.16.0)
+Installing collected packages: slicer, shap
+Successfully installed shap-0.41.0 slicer-0.0.7
+</pre>
+
+```python
+import shap
+explainer = shap.TreeExplainer(cbc_7) # 모델 객체
+shap_values = explainer.shap_values(train_data) # 학습용 Pool 객체
+
+shap.initjs()
+shap.force_plot(explainer.expected_value, shap_values[:100,:], X_train.iloc[:100,:])
+```
+
+- 동적인 시각화 plot임(interactive plot)
+
+  - 가로축과 세로축 모두에 대한 매개변수를 전환하여 모형을 분석할 수 있음
+
+  
+
+
+- summary plot 확인
+
+
+
+```python
+shap.summary_plot(shap_values, X_train)
+```
+
+<pre>
+<Figure size 800x510 with 2 Axes>
+</pre>
+Look like it matters who is your manager (MGR_ID) :D
+
+
+
+- 위 다이어그램에서 모든 직원(데이터 세트의 인스턴스/행)은 각 행에 점 하나씩으로 표시됨
+
+  - 점의 ```x 좌표```는 해당 형상이 모형의 예측에 미치는 영향을 의미
+
+  - 점의 ```색상```은 해당 직원에 대한 해당 feature의 값을 의미
+
+  - 행에 맞지 않는 점들은 쌓여서 밀도를 표현
+
+- 여기서 ```ROLE_ROLLUP_1``` 및 ```ROLE_CODE``` 피쳐는 모델 예측에 미치는 영향이 적으며, 대부분의 직원의 경우 영향이 거의 없음을 알 수 있음
+
+
+## **2-5. 최종 예측(Prediction)**
+
+
+
+```python
+%%time
+
+from sklearn.model_selection import StratifiedKFold
+
+n_fold = 4 # amount of data folds
+folds = StratifiedKFold(n_splits=n_fold, shuffle=True, random_state=SEED)
+
+params = {'loss_function':'Logloss',
+          'eval_metric':'AUC',
+          'verbose': 200,
+          'random_seed': SEED
+         }
+
+test_data = Pool(data=X_test,
+                 cat_features=cat_features)
+
+scores = []
+prediction = np.zeros(X_test.shape[0])
+for fold_n, (train_index, valid_index) in enumerate(folds.split(X, y)):
+    
+    X_train, X_valid = X.iloc[train_index], X.iloc[valid_index] # train and validation data splits
+    y_train, y_valid = y[train_index], y[valid_index]
+    
+    train_data = Pool(data=X_train, 
+                      label=y_train,
+                      cat_features=cat_features)
+    valid_data = Pool(data=X_valid, 
+                      label=y_valid,
+                      cat_features=cat_features)
+    
+    model = CatBoostClassifier(**params)
+    model.fit(train_data,
+              eval_set=valid_data, 
+              use_best_model=True
+             )
+    
+    score = model.get_best_score()['validation']['AUC']
+    scores.append(score)
+
+    y_pred = model.predict_proba(test_data)[:, 1]
+    prediction += y_pred
+
+prediction /= n_fold
+print('CV mean: {:.4f}, CV std: {:.4f}'.format(np.mean(scores), np.std(scores)))
+```
+
+<pre>
+Learning rate set to 0.069882
+0:	test: 0.5797111	best: 0.5797111 (0)	total: 89.7ms	remaining: 1m 29s
+200:	test: 0.8638646	best: 0.8638646 (200)	total: 11.6s	remaining: 46.1s
+400:	test: 0.8690869	best: 0.8691354 (377)	total: 22.8s	remaining: 34.1s
+600:	test: 0.8730484	best: 0.8730484 (600)	total: 34.1s	remaining: 22.6s
+800:	test: 0.8758933	best: 0.8761898 (791)	total: 45.1s	remaining: 11.2s
+999:	test: 0.8758019	best: 0.8767012 (846)	total: 56.1s	remaining: 0us
+
+bestTest = 0.8767012179
+bestIteration = 846
+
+Shrink model to first 847 iterations.
+Learning rate set to 0.069883
+0:	test: 0.5000000	best: 0.5000000 (0)	total: 31.2ms	remaining: 31.2s
+200:	test: 0.8946113	best: 0.8947113 (198)	total: 10.6s	remaining: 42s
+400:	test: 0.9000046	best: 0.9000046 (400)	total: 22s	remaining: 32.8s
+600:	test: 0.9016458	best: 0.9017362 (584)	total: 33.5s	remaining: 22.2s
+800:	test: 0.9017343	best: 0.9020394 (723)	total: 45.1s	remaining: 11.2s
+999:	test: 0.8998936	best: 0.9021903 (817)	total: 56.4s	remaining: 0us
+
+bestTest = 0.9021902605
+bestIteration = 817
+
+Shrink model to first 818 iterations.
+Learning rate set to 0.069883
+0:	test: 0.5000000	best: 0.5000000 (0)	total: 14.2ms	remaining: 14.2s
+200:	test: 0.9042458	best: 0.9043000 (199)	total: 10.6s	remaining: 42.3s
+400:	test: 0.9046762	best: 0.9059032 (260)	total: 22s	remaining: 32.8s
+600:	test: 0.9027506	best: 0.9059032 (260)	total: 33s	remaining: 21.9s
+800:	test: 0.9008662	best: 0.9059032 (260)	total: 44.1s	remaining: 10.9s
+999:	test: 0.8987709	best: 0.9059032 (260)	total: 54.5s	remaining: 0us
+
+bestTest = 0.9059031548
+bestIteration = 260
+
+Shrink model to first 261 iterations.
+Learning rate set to 0.069883
+0:	test: 0.5000000	best: 0.5000000 (0)	total: 28.8ms	remaining: 28.8s
+200:	test: 0.8951500	best: 0.8951673 (199)	total: 10.4s	remaining: 41.5s
+400:	test: 0.8960953	best: 0.8963737 (320)	total: 21.9s	remaining: 32.8s
+600:	test: 0.8974762	best: 0.8976249 (598)	total: 33.2s	remaining: 22s
+800:	test: 0.8980579	best: 0.8981457 (794)	total: 44.5s	remaining: 11.1s
+999:	test: 0.8972463	best: 0.8983501 (946)	total: 55.9s	remaining: 0us
+
+bestTest = 0.8983501224
+bestIteration = 946
+
+Shrink model to first 947 iterations.
+CV mean: 0.8958, CV std: 0.0113
+CPU times: user 6min 27s, sys: 7.5 s, total: 6min 34s
+Wall time: 3min 45s
+</pre>
+# **📚 Resources**
+
+1. [CatBoost documentation](https://catboost.ai/en/docs/)
+
+2. [CatBoost tutorials repository](https://github.com/catboost/tutorials)
+
+3. [Introduction to gradient boosting on decision trees with Catboost](https://towardsdatascience.com/introduction-to-gradient-boosting-on-decision-trees-with-catboost-d511a9ccbd14)
+
+4. [Working with categorical data: Catboost](https://medium.com/whats-your-data/working-with-categorical-data-catboost-8b5e11267a37)
+
+5. [Interpretable Machine Learning with XGBoost](https://towardsdatascience.com/interpretable-machine-learning-with-xgboost-9ec80d148d27)
+
