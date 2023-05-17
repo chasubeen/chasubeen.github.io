@@ -100,7 +100,7 @@ author_profile: false
 - [공식 도큐먼트](https://catboost.ai/#benchmark)
 
 
-### **📌 Catboost의 강점**
+## **📌 Catboost의 강점**
 
 **1. 범주형 변수에 대한 지원**  
 
