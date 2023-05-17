@@ -273,6 +273,6 @@ defaults:
       related: true
       show_date: true
       toc: true
-      toc_sticky: false
+      toc_sticky: true
       toc_label: "Contents"
 date_format: "%Y-%m-%d"
