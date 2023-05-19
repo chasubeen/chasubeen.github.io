@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "[ECC DS 9주차] New York City Taxi Trip Duration_2. EDA + Baseline Model"
+title:  "[ECC DS 6주차] New York City Taxi Trip Duration_2. EDA + Baseline Model"
 categories: ML
 tags: [ECC, DS, New York] 
 author_profile: false
