@@ -136,7 +136,7 @@ cf) low-code: 어플리케이션과 시스템을 빌딩할 때 거의 코딩이 
 
 
 ```python
-!pip install pycaret
+! pip install pycaret
 ```
 
 
