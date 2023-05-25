@@ -1,6 +1,6 @@
 ---
 layout: single
-title:  "[ECC DS 10주차] 회귀 3_Pycaret Introduction"
+title:  "[ECC DS 11주차] 회귀 3_Pycaret Introduction"
 categories: ML
 tags: [ECC, DS, house price] 
 author_profile: false
@@ -135,7 +135,7 @@ cf) low-code: 어플리케이션과 시스템을 빌딩할 때 거의 코딩이 
 
 
 
-```python
+```
 ! pip install pycaret
 ```
 
